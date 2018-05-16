@@ -14,7 +14,7 @@ def getNode(id):
     try:
         response = nodeTable.get_item(Key={'id': id})
     except ClientError as e:
-        return {"message" : e.response['Error']['Message']}
+        raise BadRequestError(e.response['Error']['Message'])
     else:
         if 'Item' not in response:
             raise BadRequestError("The node doesn't exist")
