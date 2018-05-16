@@ -40,8 +40,8 @@ def createNode():
     if 'id' not in nodeJson or 'location' not in nodeJson or 'shippingStatus' not in nodeJson or 'configStatus' not in nodeJson:
         return {"message" : "Input parameters are missing"}
     item = {
-        'id': nodeJson['id'],
-        'location': nodeJson['location'],
+        'id':nodeJson['id'],
+        'location':nodeJson['location'],
         'shippingStatus':nodeJson['shippingStatus'],
         'configStatus':nodeJson['configStatus']
     }
@@ -53,9 +53,9 @@ def updateNode():
     nodeJson = app.current_request.json_body
     if 'id' not in nodeJson or 'location' not in nodeJson or 'shippingStatus' not in nodeJson or 'configStatus' not in nodeJson:
         return {"message" : "Input parameters are missing"}
-    key = {'id': nodeJson['id']}
+    key = {'id':nodeJson['id']}
     exp = 'SET #location = :l, #shippingStatus = :ss, #configStatus = :cs'
-    names = {'#location' : 'location', '#shippingStatus': 'shippingStatus', '#configStatus':'configStatus'}
+    names = {'#location':'location', '#shippingStatus':'shippingStatus', '#configStatus':'configStatus'}
     vals = {':l': nodeJson['location'], ':ss': nodeJson['shippingStatus'], ':cs': nodeJson['configStatus']}
     nodeTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
     return {"message" : "You have updated node with id " + nodeJson['id']+ " successfully!"}
@@ -68,8 +68,8 @@ def createProject():
         return {"message" : "Input parameters are missing"}
     list = []
     item = {
-        'projName': projJson['projName'],
-        'customerName': projJson['customerName'],
+        'projName':projJson['projName'],
+        'customerName':projJson['customerName'],
         'startDate':projJson['startDate'],
         'endDate':projJson['endDate'],
         'nodes':list
@@ -84,10 +84,10 @@ def updateProject():
     projJson = app.current_request.json_body
     if 'projName' not in projJson or 'customerName' not in projJson or 'startDate' not in projJson or 'endDate' not in projJson:
         return {"message" : "Input parameters are missing"}
-    key = {'projName': projJson['projName']}
+    key = {'projName':projJson['projName']}
     exp = 'SET #customerName = :cn, #startDate = :sd, #endDate = :ed'
-    names = {'#customerName' : 'customerName', '#startDate': 'startDate', '#endDate':'endDate'}
-    vals = {':cn': projJson['customerName'], ':sd': projJson['startDate'], ':ed': projJson['endDate']}
+    names = {'#customerName':'customerName', '#startDate':'startDate', '#endDate':'endDate'}
+    vals = {':cn':projJson['customerName'], ':sd':projJson['startDate'], ':ed':projJson['endDate']}
     projectTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
     return {"message" : "You have updated project with name " + projJson['projName']+ " successfully!"}
 
@@ -99,7 +99,7 @@ def assign():
         return {"message" : "Input parameters are missing"}
     
     try:
-        response = nodeTable.get_item(Key={'id': dataJson['nodeId']})
+        response = nodeTable.get_item(Key={'id':dataJson['nodeId']})
     except ClientError as e:
         return {"message" : e.response['Error']['Message']}
     else:
@@ -109,7 +109,7 @@ def assign():
             node = response['Item']
 
     try:
-        response = projectTable.get_item(Key={'projName': dataJson['projName']})
+        response = projectTable.get_item(Key={'projName':dataJson['projName']})
     except ClientError as e:
         return {"message" : e.response['Error']['Message']}
     else:
@@ -124,9 +124,9 @@ def assign():
 
     nodes.append(dataJson['nodeId'])
 
-    key = {'projName': dataJson['projName']}
+    key = {'projName':dataJson['projName']}
     exp = 'SET #nodes = :n'
-    names = {'#nodes' : 'nodes'}
+    names = {'#nodes':'nodes'}
     vals = {':n': nodes}
     projectTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
     return {"message" : "You have assigned node " + dataJson['nodeId'] + " to project " + dataJson['projName']+ " successfully!" }
@@ -139,7 +139,7 @@ def unassign():
         return {"message" : "Input parameters are missing"}
     
     try:
-        response = nodeTable.get_item(Key={'id': dataJson['nodeId']})
+        response = nodeTable.get_item(Key={'id':dataJson['nodeId']})
     except ClientError as e:
         return {"message" : e.response['Error']['Message']}
     else:
@@ -149,7 +149,7 @@ def unassign():
             node = response['Item']
 
     try:
-        response = projectTable.get_item(Key={'projName': dataJson['projName']})
+        response = projectTable.get_item(Key={'projName':dataJson['projName']})
     except ClientError as e:
         return {"message" : e.response['Error']['Message']}
     else:
@@ -163,10 +163,10 @@ def unassign():
         return {"message" : "The node has not been assigned to this project"}
     nodes.remove(dataJson['nodeId'])
     
-    key = {'projName': dataJson['projName']}
+    key = {'projName':dataJson['projName']}
     exp = 'SET #nodes = :n'
-    names = {'#nodes' : 'nodes'}
-    vals = {':n': nodes}
+    names = {'#nodes':'nodes'}
+    vals = {':n':nodes}
     projectTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
     return {"message" : "You have unassigned node " + dataJson['nodeId'] + " to project " + dataJson['projName']+ " successfully!" }
 
