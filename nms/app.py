@@ -8,7 +8,7 @@ nodeTable = dynamodb.Table('node')
 projectTable = dynamodb.Table('project')
 
 
-@app.route('/getNode/{id}')
+@app.route('/nodes/{id}')
 def getNode(id):
     try:
         response = nodeTable.get_item(Key={'id': id})
@@ -21,7 +21,7 @@ def getNode(id):
             node = response['Item']
             return node
 
-@app.route('/getProject/{projName}')
+@app.route('/projects/{projName}')
 def getProject(projName):
     try:
         response = projectTable.get_item(Key={'projName': projName})
@@ -108,10 +108,6 @@ def assign():
         else:
             node = response['Item']
 
-    if node['project'] == dataJson['projName']:
-        return {"message" : "The node has already been assigned to this project"}
-
-
     try:
         response = projectTable.get_item(Key={'projName': dataJson['projName']})
     except ClientError as e:
@@ -122,15 +118,10 @@ def assign():
         else:
             project = response['Item']
 
-
-#    key = {'id': dataJson['nodeId']}
-#    exp = 'SET #project = :p'
-#    names = {'#project' : 'project'}
-#    vals = {':p': dataJson['projName']}
-#    nodeTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
-
-
     nodes = project['nodes']
+    if dataJson['nodeId'] in nodes:
+        return {"message" : "The node has already been assigned to this project"}
+
     nodes.append(dataJson['nodeId'])
 
     key = {'projName': dataJson['projName']}
@@ -157,7 +148,6 @@ def unassign():
         else:
             node = response['Item']
 
-
     try:
         response = projectTable.get_item(Key={'projName': dataJson['projName']})
     except ClientError as e:
@@ -168,16 +158,9 @@ def unassign():
         else:
             project = response['Item']
 
-    if 'project' not in node or node['project'] != dataJson['projName']:
-        return {"message" : "The node has not been assigned to this project"}
-
-#    key = {'id': dataJson['nodeId']}
-#    exp = 'SET #project = :p'
-#    names = {'#project' : 'project'}
-#    vals = {':p': ' '}
-#    nodeTable.update_item(Key=key,UpdateExpression=exp,ExpressionAttributeNames=names,ExpressionAttributeValues=vals)
-
     nodes = project['nodes']
+    if dataJson['nodeId'] not in nodes:
+        return {"message" : "The node has not been assigned to this project"}
     nodes.remove(dataJson['nodeId'])
     
     key = {'projName': dataJson['projName']}
